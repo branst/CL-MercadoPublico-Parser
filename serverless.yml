@@ -13,19 +13,19 @@ functions:
     events:
       - schedule: rate(8 hours)
     environment:
-      queueUrl: https://sqs.us-east-1.amazonaws.com/148751754238/MPubQueue
+      queueUrl: queueUrl
     iamRoleStatements:
       - Effect: Allow
         Action:
           - sqs:*
         Resource:
-          - arn:aws:sqs:us-east-1:148751754238:MPubQueue
+          - queueArn
   analyzer:
     timeout: 30
     handler: analyzer.entry
     events:
       - sqs:
-          arn: arn:aws:sqs:us-east-1:148751754238:MPubQueue
+          arn: queueArn
           batchSize: 1
     environment:
       tableName: mpub-results-table
@@ -50,7 +50,7 @@ functions:
           arn:
             Fn::GetAtt: [Table, StreamArn]
     environment:
-      ES_ENDPOINT: https://search-mpub-es-uhuqmwg6hhchtaneylgv4wtikq.us-east-1.es.amazonaws.com
+      ES_ENDPOINT: ES_ENDPOINT
       INDEX: mpub
       TYPE: string
     iamRoleStatements:

@@ -34,7 +34,7 @@ module.exports.entry = async (event) => {
       };  
 
       const { response, body } =  await requestHandler(options);
-      const keys = ["nube","azure","cloud","sistema","maquina","google","virtual","amazon","aws","computacion","ec2","almacenamiento","redes","plataforma"];
+      const keys = ["keywords"];
       
       if (keys.some(v => body.toLowerCase().includes(v))) {
         console.log('Match');
@@ -57,13 +57,6 @@ module.exports.entry = async (event) => {
         const result = await ddb.put(params).promise()
         console.log(result)   
 
-        /*ddb.putItem(params, function(err, data) {
-          if (err) {
-            console.log("Error", err);
-          } else {
-            console.log("Success", data);
-          }
-        });*/
 
       }
     }
