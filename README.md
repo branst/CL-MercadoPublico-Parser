@@ -10,3 +10,5 @@ Un set de colas de SQS hacen la función de orquestador de flujo, DynamoDB almac
 Finalmente utilizando Kibana somos capaces de hacer full text search, análisis y reportería.
 
 ![Arq](arq.png?raw=true "Arquitectura")
+
+![Bi](bi.png?raw=true "BI")
