@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "aws-sdk": "^2.685.0",
+    "dynamodb-stream-elasticsearch": "^2.10.0",
+    "request": "^2.88.2",
+    "serverless-iam-roles-per-function": "^2.0.2",
+    "uuid": "^8.1.0"
+  }
+}

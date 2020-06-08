@@ -1,0 +1,85 @@
+service: mpub
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+stage: dev
+region: us-east-1
+
+functions:
+  globalParser:
+    timeout: 120
+    handler: globalParser.entry
+    events:
+      - schedule: rate(8 hours)
+    environment:
+      queueUrl: https://sqs.us-east-1.amazonaws.com/148751754238/MPubQueue
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - sqs:*
+        Resource:
+          - arn:aws:sqs:us-east-1:148751754238:MPubQueue
+  analyzer:
+    timeout: 30
+    handler: analyzer.entry
+    events:
+      - sqs:
+          arn: arn:aws:sqs:us-east-1:148751754238:MPubQueue
+          batchSize: 1
+    environment:
+      tableName: mpub-results-table
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - sqs:*
+        Resource:
+          - "Fn::GetAtt": [ Queue, Arn ]
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+          - dynamodb:PutItem
+        Resource:
+          - "Fn::GetAtt": [ Table, Arn ]
+  streams:
+    timeout: 30
+    handler: streams.entry
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt: [Table, StreamArn]
+    environment:
+      ES_ENDPOINT: https://search-mpub-es-uhuqmwg6hhchtaneylgv4wtikq.us-east-1.es.amazonaws.com
+      INDEX: mpub
+      TYPE: string
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - es:*
+        Resource:
+          - arn:aws:es:*
+     
+resources:
+  Resources:
+    Queue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "MPubQueue"
+    Table:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: mpub-results-table
+        AttributeDefinitions:
+          - AttributeName: uri
+            AttributeType: S
+        KeySchema:
+          - AttributeName: uri
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+
+
+plugins:
+  - serverless-iam-roles-per-function
