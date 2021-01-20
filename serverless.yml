@@ -13,19 +13,19 @@ functions:
     events:
       - schedule: rate(8 hours)
     environment:
-      queueUrl: queueUrl
+      queueUrl: { Ref: Queue }
     iamRoleStatements:
       - Effect: Allow
         Action:
           - sqs:*
         Resource:
-          - queueArn
+          - "Fn::GetAtt": [ Queue, Arn ]
   analyzer:
     timeout: 30
     handler: analyzer.entry
     events:
       - sqs:
-          arn: queueArn
+          arn: - "Fn::GetAtt": [ Queue, Arn ]
           batchSize: 1
     environment:
       tableName: mpub-results-table
